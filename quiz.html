@@ -2,50 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quiz Page</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-    h1 { color: #333; }
-    #timer { font-size: 2em; margin: 20px; color: red; }
-    iframe { width: 100%; height: 80vh; border: none; }
-  </style>
 </head>
 <body>
-  <h1 id="quizTitle">Quiz</h1>
-  <div id="timer">Time Left: </div>
-  <iframe id="quizForm" src=""></iframe>
+  <h2 id="quizName"></h2>
+  <div id="timer"></div>
+  <iframe id="quizFrame" width="100%" height="600"></iframe>
 
-  <script>
-    // Parse URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    const formURL = urlParams.get("form");
-    const mins = parseInt(urlParams.get("mins")) || 10;
-    const title = urlParams.get("title") || "Quiz";
+<script>
+async function loadSettings() {
+  const repo = "nurkhalif/form-timer";
+  const filePath = "settings.json";
 
-    // Set title
-    document.getElementById("quizTitle").innerText = title;
+  const res = await fetch(`https://raw.githubusercontent.com/${repo}/main/${filePath}`);
+  const settings = await res.json();
 
-    // Set form
-    if (formURL) {
-      document.getElementById("quizForm").src = formURL;
+  // Apply settings
+  document.getElementById("quizName").innerText = settings.name;
+  document.getElementById("quizFrame").src = settings.form;
+
+  // Start countdown
+  let time = settings.minutes * 60;
+  const timerEl = document.getElementById("timer");
+  const countdown = setInterval(() => {
+    const mins = Math.floor(time / 60);
+    const secs = time % 60;
+    timerEl.innerText = `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+    time--;
+
+    if (time < 0) {
+      clearInterval(countdown);
+      timerEl.innerText = "⏰ Time's up!";
+      document.getElementById("quizFrame").style.display = "none";
     }
+  }, 1000);
+}
 
-    // Timer countdown
-    let time = mins * 60;
-    const timerEl = document.getElementById("timer");
-    const interval = setInterval(() => {
-      const minutes = Math.floor(time / 60);
-      const seconds = time % 60;
-      timerEl.innerText = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-      time--;
-
-      if (time < 0) {
-        clearInterval(interval);
-        timerEl.innerText = "Time’s up!";
-        document.getElementById("quizForm").style.display = "none";
-      }
-    }, 1000);
-  </script>
+loadSettings();
+</script>
 </body>
 </html>
