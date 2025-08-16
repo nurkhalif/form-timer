@@ -26,7 +26,7 @@ async function saveSettings() {
   // ⚠️ Replace with your repo info
   const repo = "nurkhalif/form-timer";
   const filePath = "settings.json";
-  const token = "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 "; // ⚠️ create from GitHub Settings > Developer Settings > PAT
+  const token = "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"; // ⚠️ create from GitHub Settings > Developer Settings > PAT
 
   // Get current file sha
   const res = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`);
