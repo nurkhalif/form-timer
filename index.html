@@ -1,49 +1,138 @@
-<script>
-async function saveSettings() {
-  const settings = {
-    form: document.getElementById("formLink").value.trim(),
-    minutes: parseInt(document.getElementById("minutes").value, 10),
-    name: document.getElementById("quizName").value.trim()
-  };
-
-  const content = btoa(JSON.stringify(settings, null, 2));
-
-  const repo = "nurkhalif/form-timer";
-  const filePath = "settings.json";
-  const token = "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"; // ⚠️ Remove trailing space
-
-  let sha = undefined;
-
-  try {
-    const res = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
-      headers: { "Authorization": `token ${token}` }
-    });
-    if (res.ok) {
-      const fileData = await res.json();
-      sha = fileData.sha;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
     }
-  } catch (e) {
-    console.log("File does not exist yet, will create new one.");
-  }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      background: #007bff;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    #output {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      background: #f9f9f9;
+      border-radius: 5px;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h2>Quiz Admin Page</h2>
+  
+  <label for="quizName">Quiz Name</label>
+  <input type="text" id="quizName" placeholder="e.g. Employee Assessment">
 
-  const updateRes = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
-    method: "PUT",
-    headers: {
-      "Authorization": `token ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message: "Update quiz settings",
-      content,
-      sha
-    })
-  });
+  <label for="quizLink">Quiz Link</label>
+  <input type="text" id="quizLink" placeholder="e.g. https://bit.ly/quiz">
 
-  if (updateRes.ok) {
-    document.getElementById("status").innerText = "✅ Settings saved to GitHub!";
-  } else {
-    const err = await updateRes.json();
-    document.getElementById("status").innerText = `❌ Error: ${err.message}`;
-  }
-}
-</script>
+  <label for="minutes">Time Limit (minutes)</label>
+  <input type="number" id="minutes" placeholder="e.g. 15">
+
+  <button onclick="saveSettings()">Save Settings</button>
+
+  <div id="output"></div>
+
+  <script>
+    const repoOwner = "nurkhalif";   // your GitHub username
+    const repoName = "form-timer";   // your repo name
+    const filePath = "settings.json"; // file to save
+
+    // ⚠️ Don’t expose PAT directly in production
+    const token = "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"; // replace with your GitHub Personal Access Token
+
+    async function saveSettings() {
+      const quizName = document.getElementById("quizName").value.trim();
+      const quizLink = document.getElementById("quizLink").value.trim();
+      const minutes = document.getElementById("minutes").value.trim();
+
+      if (!quizName || !quizLink || !minutes) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const settings = {
+        name: quizName,
+        form: quizLink,
+        mins: parseInt(minutes)
+      };
+
+      const content = btoa(JSON.stringify(settings, null, 2)); // encode to base64
+
+      // get file SHA if exists
+      const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+      const headers = {
+        "Authorization": `token ${token}`,
+        "Content-Type": "application/json"
+      };
+
+      let sha = null;
+      try {
+        const res = await fetch(url, { headers });
+        if (res.ok) {
+          const data = await res.json();
+          sha = data.sha;
+        }
+      } catch (err) {
+        console.error("Error checking existing file:", err);
+      }
+
+      // save file
+      const body = {
+        message: "Update quiz settings",
+        content: content,
+        sha: sha || undefined
+      };
+
+      try {
+        const res = await fetch(url, {
+          method: "PUT",
+          headers,
+          body: JSON.stringify(body)
+        });
+
+        if (res.ok) {
+          document.getElementById("output").innerText = 
+            "✅ Settings saved to GitHub successfully!";
+        } else {
+          const err = await res.json();
+          document.getElementById("output").innerText = 
+            "❌ Error saving: " + JSON.stringify(err, null, 2);
+        }
+      } catch (err) {
+        document.getElementById("output").innerText = 
+          "❌ Request failed: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
