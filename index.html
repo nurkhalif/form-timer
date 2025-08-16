@@ -1,38 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Panel</title>
-</head>
-<body>
-  <h2>Admin Settings</h2>
-  <label>Form Link: <input id="formLink"></label><br>
-  <label>Minutes: <input id="minutes" type="number"></label><br>
-  <label>Quiz Name: <input id="quizName"></label><br>
-  <button onclick="saveSettings()">Save to GitHub</button>
-
-  <p id="status"></p>
-
 <script>
 async function saveSettings() {
   const settings = {
-    form: document.getElementById("formLink").value,
-    minutes: parseInt(document.getElementById("minutes").value),
-    name: document.getElementById("quizName").value
+    form: document.getElementById("formLink").value.trim(),
+    minutes: parseInt(document.getElementById("minutes").value, 10),
+    name: document.getElementById("quizName").value.trim()
   };
 
-  const content = btoa(JSON.stringify(settings, null, 2)); // base64
+  const content = btoa(JSON.stringify(settings, null, 2));
 
-  // ⚠️ Replace with your repo info
   const repo = "nurkhalif/form-timer";
   const filePath = "settings.json";
-  const token = "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"; // ⚠️ create from GitHub Settings > Developer Settings > PAT
+  const token = "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"; // ⚠️ Remove trailing space
 
-  // Get current file sha
-  const res = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`);
-  const fileData = await res.json();
+  let sha = undefined;
 
-  // Update file
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
+      headers: { "Authorization": `token ${token}` }
+    });
+    if (res.ok) {
+      const fileData = await res.json();
+      sha = fileData.sha;
+    }
+  } catch (e) {
+    console.log("File does not exist yet, will create new one.");
+  }
+
   const updateRes = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
     method: "PUT",
     headers: {
@@ -41,17 +34,16 @@ async function saveSettings() {
     },
     body: JSON.stringify({
       message: "Update quiz settings",
-      content: content,
-      sha: fileData.sha
+      content,
+      sha
     })
   });
 
   if (updateRes.ok) {
     document.getElementById("status").innerText = "✅ Settings saved to GitHub!";
   } else {
-    document.getElementById("status").innerText = "❌ Error saving settings.";
+    const err = await updateRes.json();
+    document.getElementById("status").innerText = `❌ Error: ${err.message}`;
   }
 }
 </script>
-</body>
-</html>
