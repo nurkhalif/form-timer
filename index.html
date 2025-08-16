@@ -3,275 +3,59 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Google Form + Timer</title>
-  <meta name="description" content="Embed any Google Form with a visible countdown timer and optional time limit." />
+  <title>Admin — Google Form + Timer</title>
   <style>
-    :root {
-      --bg: #0b1020;          /* deep navy */
-      --card: #121a36;        /* card surface */
-      --ink: #e8ecff;         /* text */
-      --muted: #9fb0ff;       /* secondary text */
-      --accent: #6ea8fe;      /* accents */
-      --accent-2: #3fe1b0;    /* success */
-      --danger: #ff6b6b;      /* end/warn */
-      --warn: #ffd166;        /* warning */
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-    }
-    html, body { height: 100%; }
-    body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 20% -10%, #1b244a 0%, var(--bg) 40%), var(--bg);
-      color: var(--ink);
-    }
-    .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px 32px; }
-    .card { background: var(--card); border: 1px solid rgba(255,255,255,.07); border-radius: 18px; box-shadow: var(--shadow); }
-    .row { display: grid; grid-template-columns: 1fr; gap: 16px; }
-    @media (min-width: 960px) { .row { grid-template-columns: 360px 1fr; } }
-    .pane { padding: 18px; }
-    h1 { font-size: clamp(20px, 2.6vw, 30px); margin: 0 0 6px; letter-spacing: .2px; }
-    .sub { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
-    label { font-size: 13px; color: var(--muted); display: block; margin: 12px 0 6px; }
-    input[type="text"], input[type="number"] {
-      width: 100%; padding: 10px 12px; background: #0e1630; color: var(--ink);
-      border: 1px solid rgba(255,255,255,.12); border-radius: 12px; outline: none;
-    }
-    input[type="text"]::placeholder { color: #7580b6; }
-    .btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-    .btn { cursor: pointer; border: 0; border-radius: 12px; padding: 10px 14px; font-weight: 600; }
-    .primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #0b1020; }
-    .ghost { background: transparent; color: var(--ink); border: 1px solid rgba(255,255,255,.18); }
-    .danger { background: var(--danger); color: #1b0c0c; }
-    .warn { background: var(--warn); color: #2b2210; }
-
-    .timerCard { padding: 16px; border-radius: 16px; background: #0e1630; border: 1px solid rgba(255,255,255,.07); }
-    .digits { font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: clamp(28px, 4.6vw, 44px); letter-spacing: 2px; }
-    .status { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-    .bar { height: 10px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 12px; }
-    .fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--danger)); transition: width .25s linear; }
-
-    .iframeWrap { position: relative; overflow: hidden; border-radius: 18px; border: 1px solid rgba(255,255,255,.12); }
-    iframe { width: 100%; height: min(78vh, 1200px); border: 0; display: block; background: #0e1630; }
-
-    .overlay { position: absolute; inset: 0; background: rgba(2, 6, 23, .7); backdrop-filter: blur(3px); color: white; display: none; align-items: center; justify-content: center; padding: 24px; text-align: center; }
-    .overlay.show { display: flex; }
-
-    .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
-    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; padding: 2px 6px; border: 1px solid rgba(255,255,255,.2); border-radius: 6px; }
-    .small { font-size: 12px; color: var(--muted); }
-    .success { color: var(--accent-2); }
+    body { font-family: system-ui, sans-serif; background:#0b1020; color:#e8ecff; margin:0; padding:20px; }
+    .card { background:#121a36; padding:20px; border-radius:14px; max-width:600px; margin:auto; }
+    input, button { margin:6px 0; padding:8px; border-radius:6px; border:1px solid #555; width:100%; }
+    button { cursor:pointer; background:#6ea8fe; color:#0b1020; font-weight:600; border:0; }
+    .linkBox { margin-top:12px; padding:10px; background:#0e1630; border-radius:8px; word-break:break-all; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="row">
-      <div class="pane card">
-        <h1>Google Form + Visible Timer</h1>
-        <div class="sub">Embed a Google Form with a clear countdown. When time is up, the form is covered and inputs are blocked (iframes can't be force-submitted).
-        </div>
+  <div class="card">
+    <h1>Admin — Google Form + Timer</h1>
 
-        <label>Google Form URL <span class="small">(paste the <b>embed</b> URL or the regular form link)</span></label>
-        <input id="formUrl" type="text" placeholder="https://docs.google.com/forms/d/e/.../viewform" />
+    <label>Google Form URL</label>
+    <input id="formUrl" type="text" placeholder="https://docs.google.com/forms/d/e/.../viewform" />
 
-        <label>Time limit (minutes)</label>
-        <input id="mins" type="number" min="1" step="1" value="15" />
+    <label>Time limit (minutes)</label>
+    <input id="mins" type="number" min="1" step="1" value="15" />
 
-        <label>Page title (optional)</label>
-        <input id="titleInput" type="text" placeholder="e.g., Midterm Quiz" />
+    <label>Page title (optional)</label>
+    <input id="titleInput" type="text" placeholder="e.g., Midterm Quiz" />
 
-        <div class="btns">
-          <button class="btn primary" id="saveBtn">Save Settings</button>
-          <button class="btn ghost" id="loadBtn">Load from URL</button>
-          <button class="btn warn" id="startBtn">Start Timer</button>
-          <button class="btn ghost" id="pauseBtn">Pause</button>
-          <button class="btn danger" id="resetBtn">Reset Attempt</button>
-        </div>
-        <div class="hint">You can preconfigure via URL params: <span class="kbd">?form=&lt;URL&gt;&amp;mins=20&amp;title=Quiz</span></div>
+    <button id="saveBtn">Save & Generate Quiz Link</button>
 
-        <div class="timerCard" style="margin-top:14px;">
-          <div class="digits" id="timeDigits">00:00:00</div>
-          <div class="status" id="statusText">Idle</div>
-          <div class="bar"><div class="fill" id="fill"></div></div>
-        </div>
-      </div>
-
-      <div class="pane" id="formPane">
-        <div class="iframeWrap card">
-          <iframe id="formFrame" title="Embedded Google Form" allow="clipboard-write"></iframe>
-          <div class="overlay" id="overlay">
-            <div>
-              <h2 style="margin-top:0">Time's up ⏰</h2>
-              <p class="sub">The time limit has ended and the form is now locked. You can reset to start a new attempt.</p>
-              <div class="btns" style="justify-content:center">
-                <button class="btn primary" id="newAttemptBtn">New Attempt</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="hint">Tip: Press <span class="kbd">F11</span> for full-screen while answering.</div>
-      </div>
-    </div>
-
-    <p class="small" style="opacity:.9;margin-top:18px">
-      <b>Note:</b> For security, cross‑site iframes (like Google Forms) cannot be auto‑submitted or edited by external scripts. This page only shows a countdown and blocks interaction when time is over.
-    </p>
+    <div id="quizLink" class="linkBox" style="display:none"></div>
   </div>
 
 <script>
-(function() {
+(function(){
   const $ = sel => document.querySelector(sel);
-  const qs = new URLSearchParams(location.search);
-
-  // Elements
   const formUrlInput = $('#formUrl');
   const minsInput = $('#mins');
   const titleInput = $('#titleInput');
-  const frame = $('#formFrame');
-  const overlay = $('#overlay');
-  const timeDigits = $('#timeDigits');
-  const statusText = $('#statusText');
-  const fill = $('#fill');
-  const buttons = {
-    save: $('#saveBtn'), load: $('#loadBtn'), start: $('#startBtn'), pause: $('#pauseBtn'), reset: $('#resetBtn'), newAttempt: $('#newAttemptBtn')
-  };
+  const saveBtn = $('#saveBtn');
+  const quizLinkBox = $('#quizLink');
 
-  // State
-  let endAt = null;           // epoch ms when time ends
-  let duration = 0;           // seconds
-  let ticking = null;         // interval id
-  let pausedRemaining = null; // seconds remaining when paused
-
-  function getKey() {
+  saveBtn.addEventListener('click', () => {
     const url = formUrlInput.value.trim();
-    return 'gftimer_' + (url ? btoa(unescape(encodeURIComponent(url))).slice(0, 16) : 'blank');
-  }
-
-  function loadFromInputsToFrame() {
-    const url = formUrlInput.value.trim();
-    if (!url) { frame.srcdoc = `<div style="padding:24px; color:#e8ecff; background:#0e1630; min-height:240px">Paste your Google Form URL above, then click <b>Save</b>.` +
-      `<br/><br/>How to get it: in Google Form → <b>Send</b> → <b><></b> Embed → copy the link.</div>`; return; }
-    const embedUrl = url.includes('embedded=true') ? url : (url.includes('viewform') ? url + (url.includes('?') ? '&' : '?') + 'embedded=true' : url);
-    frame.src = embedUrl;
-  }
-
-  function fmt(sec) {
-    sec = Math.max(0, Math.floor(sec));
-    const h = String(Math.floor(sec/3600)).padStart(2,'0');
-    const m = String(Math.floor((sec%3600)/60)).padStart(2,'0');
-    const s = String(sec%60).padStart(2,'0');
-    return `${h}:${m}:${s}`;
-  }
-
-  function setStatus(msg) { statusText.textContent = msg; }
-
-  function persist() {
-    const key = getKey();
-    const data = { endAt, duration, pausedRemaining };
-    localStorage.setItem(key, JSON.stringify(data));
-  }
-  function restore() {
-    const key = getKey();
-    const raw = localStorage.getItem(key);
-    if (!raw) return;
-    try {
-      const data = JSON.parse(raw);
-      if (data.duration) duration = data.duration;
-      if (data.endAt) endAt = data.endAt;
-      if (data.pausedRemaining != null) pausedRemaining = data.pausedRemaining;
-    } catch {}
-  }
-
-  function clearAttempt() {
-    const key = getKey();
-    localStorage.removeItem(key);
-    endAt = null; pausedRemaining = null; stopTick();
-    updateUi(); overlay.classList.remove('show'); setStatus('Idle');
-  }
-
-  function startTimer() {
-    const mins = Number(minsInput.value || 0);
-    duration = Math.max(1, Math.floor(mins)) * 60;
-    if (pausedRemaining != null) {
-      endAt = Date.now() + pausedRemaining * 1000;
-      pausedRemaining = null;
-    } else {
-      endAt = Date.now() + duration * 1000;
-    }
-    persist();
-    tick();
-    if (!ticking) ticking = setInterval(tick, 250);
-    setStatus('Running');
-  }
-
-  function pauseTimer() {
-    if (!endAt) return;
-    pausedRemaining = Math.max(0, Math.ceil((endAt - Date.now())/1000));
-    endAt = null; persist(); stopTick(); updateUi(); setStatus('Paused');
-  }
-
-  function stopTick() { if (ticking) { clearInterval(ticking); ticking = null; } }
-
-  function tick() {
-    if (!endAt) return;
-    const now = Date.now();
-    const remaining = Math.max(0, Math.ceil((endAt - now)/1000));
-    timeDigits.textContent = fmt(remaining);
-    const pct = (1 - remaining / duration) * 100;
-    fill.style.width = pct + '%';
-    if (remaining <= 0) { timesUp(); }
-    else if (remaining <= 60) { setStatus('Less than 1 minute left'); }
-    else { setStatus('Running'); }
-  }
-
-  function timesUp() {
-    stopTick(); endAt = null; pausedRemaining = null; persist();
-    updateUi(); overlay.classList.add('show'); setStatus("Time's up");
-  }
-
-  function updateUi() {
-    let remaining = 0;
-    if (endAt) remaining = Math.max(0, Math.ceil((endAt - Date.now())/1000));
-    if (!endAt && pausedRemaining != null) remaining = pausedRemaining;
-    timeDigits.textContent = fmt(remaining);
-    fill.style.width = duration ? ((1 - remaining / duration) * 100) + '%' : '0%';
-  }
-
-  // Wire buttons
-  buttons.save.addEventListener('click', () => {
-    // Save settings into URL for easy sharing
-    const u = new URL(location.href);
-    const url = formUrlInput.value.trim();
-    if (url) u.searchParams.set('form', url);
-    const mins = Number(minsInput.value || 0);
-    if (mins) u.searchParams.set('mins', String(Math.floor(mins)));
+    const mins = Number(minsInput.value || 15);
     const title = titleInput.value.trim();
-    if (title) u.searchParams.set('title', title); else u.searchParams.delete('title');
-    history.replaceState({}, '', u);
-    document.title = title ? `${title} — Google Form + Timer` : 'Google Form + Timer';
-    loadFromInputsToFrame();
-    restore(); updateUi();
+
+    if(!url) { alert('Please enter a Google Form URL'); return; }
+
+    // Build quiz page URL with parameters
+    const u = new URL('quiz.html', location.href);
+    u.searchParams.set('form', url);
+    u.searchParams.set('mins', String(mins));
+    if (title) u.searchParams.set('title', title);
+
+    // Show the link for admin to share
+    quizLinkBox.style.display = 'block';
+    quizLinkBox.innerHTML = `<b>Participant Link:</b><br><a href="${u}" target="_blank">${u}</a>`;
   });
-
-  buttons.load.addEventListener('click', () => {
-    if (qs.get('form')) formUrlInput.value = qs.get('form');
-    if (qs.get('mins')) minsInput.value = Number(qs.get('mins')) || 15;
-    if (qs.get('title')) titleInput.value = qs.get('title');
-    document.title = qs.get('title') ? `${qs.get('title')} — Google Form + Timer` : 'Google Form + Timer';
-    loadFromInputsToFrame(); restore(); updateUi();
-  });
-
-  buttons.start.addEventListener('click', () => { startTimer(); });
-  buttons.pause.addEventListener('click', () => { pauseTimer(); });
-  buttons.reset.addEventListener('click', () => { clearAttempt(); });
-  buttons.newAttempt.addEventListener('click', () => { clearAttempt(); startTimer(); overlay.classList.remove('show'); });
-
-  // Init from URL on first load
-  if (qs.get('form')) formUrlInput.value = qs.get('form');
-  if (qs.get('mins')) minsInput.value = Number(qs.get('mins')) || 15;
-  if (qs.get('title')) titleInput.value = qs.get('title');
-  document.title = qs.get('title') ? `${qs.get('title')} — Google Form + Timer` : 'Google Form + Timer';
-
-  loadFromInputsToFrame(); restore(); updateUi();
 })();
 </script>
 </body>
