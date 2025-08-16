@@ -1,62 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin — Google Form + Timer</title>
-  <style>
-    body { font-family: system-ui, sans-serif; background:#0b1020; color:#e8ecff; margin:0; padding:20px; }
-    .card { background:#121a36; padding:20px; border-radius:14px; max-width:600px; margin:auto; }
-    input, button { margin:6px 0; padding:8px; border-radius:6px; border:1px solid #555; width:100%; }
-    button { cursor:pointer; background:#6ea8fe; color:#0b1020; font-weight:600; border:0; }
-    .linkBox { margin-top:12px; padding:10px; background:#0e1630; border-radius:8px; word-break:break-all; }
-  </style>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
 </head>
 <body>
-  <div class="card">
-    <h1>Admin — Google Form + Timer</h1>
+  <h2>Admin Settings</h2>
+  <label>Form Link: <input id="formLink"></label><br>
+  <label>Minutes: <input id="minutes" type="number"></label><br>
+  <label>Quiz Name: <input id="quizName"></label><br>
+  <button onclick="saveSettings()">Save to GitHub</button>
 
-    <label>Google Form URL</label>
-    <input id="formUrl" type="text" placeholder="https://docs.google.com/forms/d/e/.../viewform" />
-
-    <label>Time limit (minutes)</label>
-    <input id="mins" type="number" min="1" step="1" value="15" />
-
-    <label>Page title (optional)</label>
-    <input id="titleInput" type="text" placeholder="e.g., Midterm Quiz" />
-
-    <button id="saveBtn">Save & Generate Quiz Link</button>
-
-    <div id="quizLink" class="linkBox" style="display:none"></div>
-  </div>
+  <p id="status"></p>
 
 <script>
-(function(){
-  const $ = sel => document.querySelector(sel);
-  const formUrlInput = $('#formUrl');
-  const minsInput = $('#mins');
-  const titleInput = $('#titleInput');
-  const saveBtn = $('#saveBtn');
-  const quizLinkBox = $('#quizLink');
+async function saveSettings() {
+  const settings = {
+    form: document.getElementById("formLink").value,
+    minutes: parseInt(document.getElementById("minutes").value),
+    name: document.getElementById("quizName").value
+  };
 
-  saveBtn.addEventListener('click', () => {
-    const url = formUrlInput.value.trim();
-    const mins = Number(minsInput.value || 15);
-    const title = titleInput.value.trim();
+  const content = btoa(JSON.stringify(settings, null, 2)); // base64
 
-    if(!url) { alert('Please enter a Google Form URL'); return; }
+  // ⚠️ Replace with your repo info
+  const repo = "nurkhalif/form-timer";
+  const filePath = "settings.json";
+  const token = "YOUR_GITHUB_PERSONAL_ACCESS_TOKEN"; // ⚠️ create from GitHub Settings > Developer Settings > PAT
 
-    // Build quiz page URL with parameters
-    const u = new URL('quiz.html', location.href);
-    u.searchParams.set('form', url);
-    u.searchParams.set('mins', String(mins));
-    if (title) u.searchParams.set('title', title);
+  // Get current file sha
+  const res = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`);
+  const fileData = await res.json();
 
-    // Show the link for admin to share
-    quizLinkBox.style.display = 'block';
-    quizLinkBox.innerHTML = `<b>Participant Link:</b><br><a href="${u}" target="_blank">${u}</a>`;
+  // Update file
+  const updateRes = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
+    method: "PUT",
+    headers: {
+      "Authorization": `token ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message: "Update quiz settings",
+      content: content,
+      sha: fileData.sha
+    })
   });
-})();
+
+  if (updateRes.ok) {
+    document.getElementById("status").innerText = "✅ Settings saved to GitHub!";
+  } else {
+    document.getElementById("status").innerText = "❌ Error saving settings.";
+  }
+}
 </script>
 </body>
 </html>
