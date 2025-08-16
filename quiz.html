@@ -3,11 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <title>Quiz Page</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      animation: fadeIn 1s ease;
+    }
+
+    h2 {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 15px;
+      background: linear-gradient(90deg, #4facfe, #00f2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    #timer {
+      font-size: 1.3rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #fffa;
+      padding: 10px 20px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    iframe {
+      width: 100%;
+      height: 600px;
+      border-radius: 12px;
+      border: none;
+      background: #fff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-  <h2 id="quizName"></h2>
-  <div id="timer"></div>
-  <iframe id="quizFrame" width="100%" height="600"></iframe>
+  <div class="container">
+    <h2 id="quizName">Loading Quiz...</h2>
+    <div id="timer">--:--</div>
+    <iframe id="quizFrame"></iframe>
+  </div>
 
 <script>
 async function loadSettings() {
